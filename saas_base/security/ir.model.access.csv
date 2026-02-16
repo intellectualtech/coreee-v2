@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_create,perm_read,perm_write,perm_unlink
+access_saas_plan_user,access_saas_plan_user,model_saas_plan,base.group_user,0,1,0,0
+access_saas_tenant_admin,access_saas_tenant_admin,model_saas_tenant,saas_admin.group_saas_admin,1,1,1,1
+access_saas_subscription_admin,access_saas_subscription_admin,model_saas_subscription,saas_admin.group_saas_admin,1,1,1,1
