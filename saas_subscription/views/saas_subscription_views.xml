@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filepath: /workspaces/coreee-v2/saas_subscription/views/saas_subscription_views.xml -->
+<odoo>
+    <data>
+        <record id="view_saas_subscription_tree" model="ir.ui.view">
+            <field name="name">saas.subscription.tree</field>
+            <field name="model">saas.subscription</field>
+            <field name="arch" type="xml">
+                <tree string="Subscriptions" decoration-danger="state == 'past_due'"
+                      decoration-warning="state == 'suspended'" decoration-success="state == 'active'">
+                    <field name="tenant_id"/>
+                    <field name="plan_id"/>
+                    <field name="billing_interval"/>
+                    <field name="monthly_price" sum="Total"/>
+                    <field name="is_trial"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_saas_subscription_form" model="ir.ui.view">
+            <field name="name">saas.subscription.form</field>
+            <field name="model">saas.subscription</field>
+            <field name="arch" type="xml">
+                <form string="Subscription">
+                    <header>
+                        <button name="action_convert_to_paid" string="Convert to Paid" 
+                                type="object" states="trial" class="btn-primary"/>
+                        <button name="action_upgrade_plan" string="Upgrade Plan" 
+                                type="object" states="active" class="btn-info"/>
+                        <button name="action_cancel" string="Cancel" 
+                                type="object" states="active,trial" class="btn-danger"/>
+                        <field name="state" widget="statusbar" 
+                               statusbar_visible="trial,active,past_due,suspended"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group string="Subscription">
+                                <field name="tenant_id" readonly="1"/>
+                                <field name="plan_id"/>
+                                <field name="billing_interval"/>
+                            </group>
+                            <group string="Status">
+                                <field name="state" readonly="1"/>
+                                <field name="is_trial" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Trial Information" attrs="{'invisible': [('is_trial', '=', False)]}">
+                            <group>
+                                <field name="trial_start" readonly="1"/>
+                                <field name="trial_end" readonly="1"/>
+                                <field name="trial_days_remaining" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Pricing">
+                            <group>
+                                <field name="monthly_price" widget="monetary" readonly="1"/>
+                                <field name="yearly_price" widget="monetary" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Billing Dates">
+                            <group>
+                                <field name="last_invoice_date" readonly="1"/>
+                                <field name="next_invoice_date"/>
+                            </group>
+                        </group>
+                        <group string="Invoices">
+                            <field name="invoice_ids" nolabel="1">
+                                <tree>
+                                    <field name="invoice_date"/>
+                                    <field name="amount" widget="monetary"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_saas_subscription_search" model="ir.ui.view">
+            <field name="name">saas.subscription.search</field>
+            <field name="model">saas.subscription</field>
+            <field name="arch" type="xml">
+                <search string="Search Subscriptions">
+                    <field name="tenant_id"/>
+                    <field name="plan_id"/>
+                    <separator/>
+                    <filter name="trial" string="Trials" domain="[('is_trial', '=', True)]"/>
+                    <filter name="paid" string="Paid" domain="[('is_trial', '=', False)]"/>
+                    <filter name="active" string="Active" domain="[('state', '=', 'active')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_plan" string="Plan" context="{'group_by': 'plan_id'}"/>
+                        <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_saas_subscription" model="ir.actions.act_window">
+            <field name="name">Subscriptions</field>
+            <field name="res_model">saas.subscription</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_saas_subscription_search"/>
+        </record>
+
+        <menuitem id="menu_saas_subscription" name="Subscriptions" parent="menu_saas_root" 
+                  action="saas_subscription.action_saas_subscription" sequence="30"/>
+    </data>
+</odoo>

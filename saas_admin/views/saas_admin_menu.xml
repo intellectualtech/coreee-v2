@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filepath: /workspaces/coreee-v2/saas_admin/views/saas_admin_menu.xml -->
+<odoo>
+    <data>
+        <menuitem id="menu_saas_root" name="SaaS" sequence="1" groups="saas_admin.group_saas_admin"/>
+        
+        <menuitem id="menu_saas_settings" name="Settings" parent="menu_saas_root" sequence="100"/>
+    </data>
+</odoo>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filepath: /workspaces/coreee-v2/saas_client/views/client_panel_views.xml -->
+<odoo>
+    <data>
+        <record id="view_saas_backup_tree" model="ir.ui.view">
+            <field name="name">saas.backup.tree</field>
+            <field name="model">saas.backup</field>
+            <field name="arch" type="xml">
+                <tree string="Backups" decoration-success="state == 'completed'"
+                      decoration-danger="state == 'failed'">
+                    <field name="tenant_id"/>
+                    <field name="backup_type"/>
+                    <field name="file_size"/>
+                    <field name="created_date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_saas_backup_form" model="ir.ui.view">
+            <field name="name">saas.backup.form</field>
+            <field name="model">saas.backup</field>
+            <field name="arch" type="xml">
+                <form string="Backup">
+                    <header>
+                        <button name="action_start_backup" string="Start Backup" 
+                                type="object" states="pending" class="btn-primary"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group string="Backup Information">
+                                <field name="tenant_id" readonly="1"/>
+                                <field name="backup_type"/>
+                                <field name="created_date" readonly="1"/>
+                                <field name="completed_date" readonly="1"/>
+                            </group>
+                            <group string="File Information">
+                                <field name="file_name" readonly="1"/>
+                                <field name="file_size" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_saas_backup" model="ir.actions.act_window">
+            <field name="name">Backups</field>
+            <field name="res_model">saas.backup</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

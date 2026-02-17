@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filepath: /workspaces/coreee-v2/saas_admin/security/groups.xml -->
+<odoo>
+    <data>
+        <record id="group_saas_admin" model="res.groups">
+            <field name="name">SaaS Admin</field>
+            <field name="category_id" ref="base.module_category_tools"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

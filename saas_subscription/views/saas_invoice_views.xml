@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filepath: /workspaces/coreee-v2/saas_subscription/views/saas_invoice_views.xml -->
+<odoo>
+    <data>
+        <record id="view_saas_invoice_tree" model="ir.ui.view">
+            <field name="name">saas.invoice.tree</field>
+            <field name="model">saas.invoice</field>
+            <field name="arch" type="xml">
+                <tree string="Invoices" decoration-danger="state == 'overdue'"
+                      decoration-warning="state == 'past_due'" decoration-success="state == 'paid'"
+                      decoration-muted="state == 'cancelled'">
+                    <field name="subscription_id"/>
+                    <field name="tenant_id"/>
+                    <field name="invoice_date"/>
+                    <field name="due_date"/>
+                    <field name="amount" sum="Total" widget="monetary"/>
+                    <field name="paid_amount" sum="Total Paid" widget="monetary"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_saas_invoice_form" model="ir.ui.view">
+            <field name="name">saas.invoice.form</field>
+            <field name="model">saas.invoice</field>
+            <field name="arch" type="xml">
+                <form string="Invoice">
+                    <header>
+                        <button name="action_post" string="Post" 
+                                type="object" states="draft" class="btn-primary"/>
+                        <button name="action_mark_paid" string="Mark as Paid" 
+                                type="object" states="posted,overdue" class="btn-success"/>
+                        <button name="action_send_email" string="Send Email" 
+                                type="object" class="btn-info"/>
+                        <button name="action_send_reminder" string="Send Reminder" 
+                                type="object" states="posted,overdue" class="btn-warning"/>
+                        <button name="action_cancel" string="Cancel" 
+                                type="object" states="draft,posted" class="btn-danger"/>
+                        <field name="state" widget="statusbar" 
+                               statusbar_visible="draft,posted,paid,overdue"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group string="Invoice Details">
+                                <field name="subscription_id" readonly="1"/>
+                                <field name="tenant_id" readonly="1"/>
+                                <field name="description"/>
+                            </group>
+                            <group string="Dates">
+                                <field name="invoice_date"/>
+                                <field name="due_date"/>
+                                <field name="paid_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Amount">
+                                <field name="amount" widget="monetary"/>
+                                <field name="currency_id"/>
+                                <field name="paid_amount" widget="monetary"/>
+                            </group>
+                            <group string="Reminders">
+                                <field name="reminder_count" readonly="1"/>
+                                <field name="last_reminder_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <field name="notes" widget="html"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_saas_invoice_search" model="ir.ui.view">
+            <field name="name">saas.invoice.search</field>
+            <field name="model">saas.invoice</field>
+            <field name="arch" type="xml">
+                <search string="Search Invoices">
+                    <field name="tenant_id"/>
+                    <field name="subscription_id"/>
+                    <separator/>
+                    <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="posted" string="Posted" domain="[('state', '=', 'posted')]"/>
+                    <filter name="paid" string="Paid" domain="[('state', '=', 'paid')]"/>
+                    <filter name="overdue" string="Overdue" domain="[('state', '=', 'overdue')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_tenant" string="Tenant" context="{'group_by': 'tenant_id'}"/>
+                        <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_saas_invoice" model="ir.actions.act_window">
+            <field name="name">Invoices</field>
+            <field name="res_model">saas.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_saas_invoice_search"/>
+        </record>
+
+        <menuitem id="menu_saas_invoice" name="Invoices" parent="menu_saas_root" 
+                  action="saas_subscription.action_saas_invoice" sequence="40"/>
+    </data>
+</odoo>
