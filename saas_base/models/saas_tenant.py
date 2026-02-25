@@ -110,26 +110,46 @@ class SaaSTenant(models.Model):
 
     def _create_db_from_template(self):
         """Create PostgreSQL database from template"""
-        db = self.env.cr.dbname
         template_db = 'saas_template'
         
-        # PostgreSQL connection
-        import psycopg2
-        from odoo.sql_db import dsn
+        # PostgreSQL connection - use proper connection parameters
+        from odoo.tools import config
         
-        conn = psycopg2.connect(dsn(self.env.cr.dbname))
-        conn.autocommit = True
-        cursor = conn.cursor()
+        db_host = config.get('db_host') or 'localhost'
+        db_port = config.get('db_port') or 5432
+        db_user = config.get('db_user') or 'odoo'
+        db_password = config.get('db_password')
+        
+        conn_params = {
+            'host': db_host,
+            'port': int(db_port),
+            'user': db_user,
+            'dbname': 'postgres',  # Connect to postgres database to create new database
+        }
+        
+        if db_password:
+            conn_params['password'] = db_password
         
         try:
-            cursor.execute(f"CREATE DATABASE {self.db_name} TEMPLATE {template_db}")
-            _logger.info(f"Created database: {self.db_name}")
-        except psycopg2.Error as e:
-            if 'already exists' not in str(e):
-                raise
-        finally:
-            cursor.close()
-            conn.close()
+            conn = psycopg2.connect(**conn_params)
+            conn.autocommit = True
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute(f'CREATE DATABASE "{self.db_name}" TEMPLATE "{template_db}"')
+                _logger.info(f"Created database: {self.db_name}")
+            except psycopg2.Error as e:
+                if 'already exists' not in str(e):
+                    _logger.error(f"Database creation error: {e}")
+                    raise
+            finally:
+                cursor.close()
+                conn.close()
+        except psycopg2.OperationalError as e:
+            _logger.error(f"Database connection error: {e}")
+            raise ValidationError(
+                _('Database connection failed. Ensure PostgreSQL user has CREATE DATABASE permission: %s') % str(e)
+            )
 
     def _create_admin_user(self):
         """Create admin user in tenant database"""
